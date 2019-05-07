@@ -9,8 +9,8 @@
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
 
-const char* ssid = "Lenovo";
-const char* password = "alabala5";
+const char* ssid = "net365.mobi";
+const char* password = "28007442";
 
 // Set web server port number to 80
 WiFiServer server(80);
@@ -45,7 +45,6 @@ void setup() {
   digitalWrite(DC1, HIGH);
   digitalWrite(UC2, HIGH);
   digitalWrite(DC2, HIGH);
-
   
   digitalWrite(PHASE, LOW);
   digitalWrite(ENABLE, LOW);
@@ -55,16 +54,12 @@ void setup() {
 
   Serial.print("Connecting to ");
   Serial.println(ssid);
-  IPAddress ip(192,168,8,66);   
-  IPAddress gateway(192,168,0,100);   
-  IPAddress subnet(255,255,255,0);   
-  WiFi.config(ip, gateway, subnet);
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
   }
-  // Print local IP address and start web server
+
   Serial.println("");
   Serial.println("WiFi connected.");
   Serial.println("IP address: ");
@@ -177,28 +172,12 @@ void loop(){
                   goUp();
                 }
               }
-            }else if(header.indexOf("/StepFive") >= 0){
-              Serial.print("FIVE");
-              while(Pos0 != 5){
-                if(Pos0 == 6){
-                  goUp();
-                }else{
-                  goUp();
-                }
-              }
-            }else if(header.indexOf("/StepSix") >= 0){
-              Serial.print("SIX");
-              while(Pos0 != 6){
-                goDown();
-              }
             }else if(header.indexOf("/MotorF") >= 0){
               digitalWrite(PHASE, LOW);
               digitalWrite(ENABLE, HIGH);
               delay(500);
               digitalWrite(ENABLE, LOW);
             }
-
-            
 
             Serial.print("[POS1]");
             Serial.print(Pos1);
@@ -207,12 +186,44 @@ void loop(){
             Serial.print("[POS0]");
             Serial.print(Pos0);
             
-            // Display the HTML web page
             client.println("<!DOCTYPE html><html>");
             client.println("<head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">");
+
+            client.println("<script>window.onload = function(){var x = document.getElementsByClassName(\"button"+String(Pos0)+"\"); var i; for(i = 0; i < x.length; i++){x[i].classList.add(\"selected\");}}</script>");
+
+            
+            client.println("<style>");
+
+            client.println("body{ background-color: #333}");
+            client.println("ul{ padding: 0; list-style-type: none; }");
+            client.println("li{ font-size: 25px; width: 8em; height: 2em; color: orange; border-left: 0.08em solid; position: relative; margin-top: 0.8em; cursor: pointer; margin-left: auto; margin-right: auto; }");
+            client.println("li::before, li::after{ content: ''; position: absolute; width: inherit; border-left: inherit; z-index: -1; }");
+            client.println("li::before{ height: 80%; top: 10%; left: calc(-0.15em - 0.08em * 2); filter: brightness(0.8); }");
+            client.println("li::after{ height: 60%; top: 20%; left: calc(-0.15em * 2 - 0.08em * 3); filter: brightness(0.6); }");
+            client.println("li span{ position: relative; height: 120%; top: -10%; box-sizing: border-box; border: 0.08em solid; background-color: #333; display: flex; align-items: center; justify-content: center; font-family: sans-serif; text-transform: capitalize; transform: translateX(calc(-0.15em * 3 - 0.08em * 2)); transition: 0.3s; }");
+            client.println("li:hover span{ transform: translateX(0.15em); }");
+            client.println("a{ color: #FFA500; text-decoration: none}");
+            client.println(".red{color: #F26 !important}");
+            client.println(".selected{color: #62F !important}");
+            client.println("hr{height: 10px; border: 0; margin: 20px; box-shadow: 0 10px 10px -10px #ffa500 inset;}");
+            client.println(".title{font-family: Helvetica Neue, Helvetica, Arial, sans-serif; font-size: 45pt; font-weight: 100; letter-spacing: 2px; text-align: center; color: #f35626; background-image: -webkit-linear-gradient(92deg, #f35626, #feab3a); -webkit-background-clip: text; -webkit-text-fill-color: transparent; -webkit-animation: hue 10s infinite linear; } @-webkit-keyframes hue { from { -webkit-filter: hue-rotate(0deg); } to { -webkit-filter: hue-rotate(-360deg); } }");
+            
+            client.println("</style>");
             client.println("<link rel=\"icon\" href=\"data:,\"></head>");
             
-            client.println("<body><h1>ESP8266 Web Server</h1>");
+            client.println("<body>");
+
+            client.println("<h1 class=\"title\">Toaster Web Server</h1>");
+            client.println("");
+            client.println("<ul>");
+            client.println("<li class=\"red\"><span><a class=\"red\" href=\"/MotorF\">EJECT</a></span></li>");
+            client.println("<hr>");
+            client.println("<li class=\"button0\"><span><a class=\"button0\" href=\"/StepZero\">0</a></span></li>");
+            client.println("<li class=\"button1\"><span><a class=\"button1\" href=\"/StepOne\">1</a></span></li>");
+            client.println("<li class=\"button2\"><span><a class=\"button2\" href=\"/StepTwo\">2</a></span></li>");
+            client.println("<li class=\"button3\"><span><a class=\"button3\" href=\"/StepThree\">3</a></span></li>");
+            client.println("<li class=\"button4\"><span><a class=\"button4\" href=\"/StepFour\">4</a></span></li>");
+            client.println("</ul>");
             
             client.println("</body></html>");
             
@@ -277,7 +288,7 @@ uint8_t pin = 0;
   digitalWrite(pin, LOW);
   delay(2600);
   digitalWrite(pin, HIGH);
-  delay(5);
+  delay(15);
 }
 
 void goUp(){
